@@ -1,6 +1,9 @@
 from itertools import combinations
 
 
+# Kiểm tra xem chuỗi có mã hóa bằng ECB không bằng cách chia chuỗi
+# thành các khối có kích thước k (trong bài là 16) rồi đếm số lượng
+# các cặp khối giống nhau, nếu các cặp giống nhau thì chuỗi đc mã hóa bằng ECB
 def detect_aes_in_ecb_score(x, k):
     chunks = [x[i:i + k] for i in range(0, len(x), k)]
     pairs = combinations(chunks, 2)

@@ -1,6 +1,7 @@
 from codecs import encode, decode
 
 
+# Sử dụng hàm của thư viện để decode
 def hex_to_base64(htb_str):
     b64 = encode(decode(htb_str, 'hex'), 'base64').decode()
     return b64

@@ -28,8 +28,9 @@ class Oracle:
         return b';admin=true;' in decrypted
 
 
+# Xác định size trong chuỗi đã mã hóa để sau đó tìm được vị trí của chuỗi admin trong khối cuối cùng
+# (cần admin xuất hiện sau 'role=')
 def detect_prefix_length(oracle: Oracle, block_size: int) -> int:
-    # detect how many complete block_size fit into the prefix
     full_block_len = 0
     c1 = oracle.encode(b'')
     c2 = oracle.encode(b'A')
@@ -38,7 +39,7 @@ def detect_prefix_length(oracle: Oracle, block_size: int) -> int:
             full_block_len = i
             break
 
-    # detect the prefix length in its final block
+    # https://www.w3schools.com/python/ref_func_slice.asp
     block_idx = slice(full_block_len, full_block_len+block_size)
     prev_block = c1[block_idx]
     pad_len = 0
@@ -49,13 +50,12 @@ def detect_prefix_length(oracle: Oracle, block_size: int) -> int:
             break
         prev_block = new_block
 
-    # combine the length in blocks and the padding length
     prefix_len = full_block_len + block_size - pad_len
     return prefix_len
 
 
 def generate_attack_sequence(oracle: Oracle, prefix_len: int):
-    # align our input to new block
+    # Chỉnh prefix_len phù hợp với AES (16)
     if prefix_len % AES_BLOCK_SIZE != 0:
         pad_len = AES_BLOCK_SIZE - (prefix_len % AES_BLOCK_SIZE)
     else:

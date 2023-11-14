@@ -6,6 +6,7 @@ from src.Utilities.AES import AesCtr
 AES_BLOCK_SIZE = 16
 
 
+# Tương tự bitflipping của CBC
 class Oracle:
     def __init__(self):
         self.key = get_random_bytes(AES_BLOCK_SIZE)

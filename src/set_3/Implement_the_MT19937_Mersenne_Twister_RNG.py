@@ -1,3 +1,6 @@
+# https://en.wikipedia.org/wiki/Mersenne_Twister
+# https://en.wikipedia.org/wiki/List_of_random_number_generators
+
 class MT19937:
     # The coefficients of MT19937
     (w, n, m, r) = (32, 624, 397, 31)
@@ -23,6 +26,7 @@ class MT19937:
         self.index = self.n
         return self
 
+    # Lặp qua các giá trị được sinh ra bởi bộ sinh số ngẫu nhiên
     def __iter__(self):
         """ Extract a tempered value based on MT[index] """
         idx = 0

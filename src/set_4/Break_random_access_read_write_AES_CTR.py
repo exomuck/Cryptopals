@@ -25,6 +25,10 @@ class EditOracle:
         return ciphertext
 
     def edit(self, ciphertext: bytes, offset: int, new_text: bytes):
+        # Phương thức này cho phép bạn thay thế một phần của ciphertext bằng văn bản mới.
+        # Nó tạo ra một keystream có độ dài giống như ciphertext bằng cách sử dụng đối tượng CTR.
+        # Sau đó, nó cắt keystream từ offset đến độ dài của văn bản mới.
+        # Ciphertext mới được tạo bằng cách XOR keystream đã cắt với văn bản mới.
         key_stream = self.ctr_obj.generate_key_stream(len(ciphertext))
         key_stream = key_stream[offset: offset + len(new_text)]
 

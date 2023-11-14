@@ -5,21 +5,27 @@ from itertools import combinations
 
 # Globals
 COUNTS = [bin(x).count("1") for x in range(256)]
+# Tần suất xuất hiện của từng chữ cái trong bảng chữ cái tiếng Anh
 FREQ = {'a': 0.0651738, 'b': 0.0124248, 'c': 0.0217339, 'd': 0.0349835, 'e': 0.1041442, 'f': 0.0197881, 'g': 0.0158610,
         'h': 0.0492888, 'i': 0.0558094, 'j': 0.0009033, 'k': 0.0050529, 'l': 0.0331490, 'm': 0.0202124, 'n': 0.0564513,
         'o': 0.0596302, 'p': 0.0137645, 'q': 0.0008606, 'r': 0.0497563, 's': 0.0515760, 't': 0.0729357, 'u': 0.0225134,
         'v': 0.0082903, 'w': 0.0171272, 'x': 0.0013692, 'y': 0.0145984, 'z': 0.0007836, ' ': 0.1918182}
 
 
-def xor_bytes(b1: bytes, b2: bytes) -> bytes:
+# Phép xor giữa 2 chuỗi byte
+def xor_bytes(b1, b2):
     return bytes([_a ^ _b for _a, _b in zip(b1, b2)])
 
 
-def xor_bytes_const(b: bytes, const: int) -> bytes:
+# Phép xor giữa chuỗi byte với 1 số nguyên
+def xor_bytes_const(b, const):
     return bytes([const ^ _b for _b in b])
 
 
-def bhattacharyya_distance(dist1: dict, dist2: dict) -> float:
+# Tính khoảng cách Bhattacharyya (xác suất thống kê)
+# https://pypi.org/project/dictances/
+# https://safjan.com/understanding-bhattacharyya-distance-and-coefficient-for-probability-distributions/
+def bhattacharyya_distance(dist1, dist2):
     bc_coeff = 0
     for letter in FREQ.keys():
         bc_coeff += math.sqrt(dist1[letter] * dist2[letter])
@@ -27,10 +33,10 @@ def bhattacharyya_distance(dist1: dict, dist2: dict) -> float:
     return -math.log(bc_coeff)
 
 
-def score_string(word: bytes) -> float:
+# Đánh giá 1 chuỗi dựa trên tần suất xuất hiện (FREQ)
+def score_string(word):
     curr_freq = {letter: 0 for letter in FREQ.keys()}
 
-    # calc letter dist for current word
     num_letters = 0
     for i in word:
         if chr(i).lower() in FREQ.keys():
@@ -42,38 +48,40 @@ def score_string(word: bytes) -> float:
     else:
         return 0
 
-    # evaluate dist using the Bhattacharyya distance
+    # Dự đoán khoảng cách bằng bhattacharyya_distance()
     distance = bhattacharyya_distance(FREQ, curr_freq)
     return 1 / distance
 
 
-def repeating_key_xor(stream: bytes, key: bytes) -> bytes:
+# Mã hóa chuỗi xor bằng phép xor với 1 key lặp đi lặp lại
+def repeating_key_xor(stream, key):
     return bytes([letter ^ key[idx % len(key)] for idx, letter in enumerate(stream)])
 
 
-def hamming_dist(b1: bytes, b2: bytes) -> int:
-    """ Number of different bits """
+# Tính khoảng cách của các số bit khác nhau giữa 2 byte
+def hamming_dist(b1, b2):
     diff = xor_bytes(b1, b2)
     count = sum(map(lambda x: COUNTS[x], diff))
     return count
 
 
-def eval_key_size(stream: bytes, max_key_size: int) -> int:
+# Kích thước key tạo ra để khoảng cách các số bit khác nhau giữa 2 byte là nhỏ nhất trong các khối data
+def eval_key_size(stream, max_key_size):
     # default values
     min_dist = max_key_size * 8
     best_key_size = 2
 
-    # find best key size
+    # Tìm size hợp lí nhất của key
     for key_size in range(2, max_key_size):
-        # calc dist between close chunks
+        # Tính khoảng cách giữa các chunk (khối data)
         idx_list = combinations(range(5), 2)
         dist_list = []
         for idx in idx_list:
-            block1 = stream[idx[0] * key_size:(idx[0]+1) * key_size]
-            block2 = stream[idx[1] * key_size:(idx[1]+1) * key_size]
+            block1 = stream[idx[0] * key_size:(idx[0] + 1) * key_size]
+            block2 = stream[idx[1] * key_size:(idx[1] + 1) * key_size]
             dist_list.append(hamming_dist(block1, block2))
 
-        # calc and update best result
+        # Cập nhật kết quả tốt nhất
         total_dist = statistics.mean(dist_list) / key_size
         if total_dist < min_dist:
             min_dist = total_dist
@@ -82,12 +90,14 @@ def eval_key_size(stream: bytes, max_key_size: int) -> int:
     return best_key_size
 
 
-def transpose_blocks(stream: bytes, key_size: int) -> list[bytes]:
+# Chia dữ liệu thành các khối có kích thước bằng với kích thước của khóa
+def divide_blocks(stream, key_size):
     block_list = [stream[shift::key_size] for shift in range(key_size)]
     return block_list
 
 
-def decode_single_byte_xor_cypher(src: bytes) -> int:
+# Giải mã chuỗi được mã hóa bằng phép xor với 1 byte duy nhất
+def decode_single_byte_xor_cypher(src):
     max_score = 0
     best_key = 0
     for i in range(2 ** 8):
@@ -102,20 +112,20 @@ def decode_single_byte_xor_cypher(src: bytes) -> int:
 
 
 def main():
-    # key size range
+    # Đặt size của key = 40
     KEYSIZE = 40
 
-    # load cipher and decode base64 to bytes
+    # Chuyển từ base64 sang byte, lấy từ file txt
     with open('../../assets/break_repeating_key_xor.txt', 'r') as fh:
         cipher = base64.b64decode(fh.read())
 
-    # estimate key size
+    # Tìm kích thước key hợp lí nhất
     key_size = eval_key_size(cipher, KEYSIZE)
 
-    # divide and transpose blocks
-    block_list = transpose_blocks(cipher, key_size)
+    # Chia các chunk để decode
+    block_list = divide_blocks(cipher, key_size)
 
-    # reconstruct key
+    # Mỗi block/chunk sẽ có chung 1 key để decode
     key = []
     for block in block_list:
         key.append(decode_single_byte_xor_cypher(block))
@@ -123,7 +133,7 @@ def main():
     key = bytes(key)
     print(f'{key=}')
 
-    # decode the stream
+    # Chèn key và cipher vào hàm decode sau đó in ra
     word = repeating_key_xor(cipher, key)
     print(f'{word=}')
 

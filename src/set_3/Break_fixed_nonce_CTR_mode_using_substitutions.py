@@ -58,8 +58,13 @@ def transpose_streams(streams: list[bytes]) -> list[bytes]:
     make a stream that is the first byte of every stream,
     and a stream that is the second byte of every stream, and so on...
     """
+    # Tìm độ dài lớn nhất của các luồng (list)
     max_len = max(map(len, streams))
+
+    # Tạo 1 danh sách các luồng rỗng với độ dài max len
     out_streams = [bytes() for _ in range(max_len)]
+
+    # Vòng lặp để lấy các byte đầu tiên, byte t2, byte t3, ...
     for stream in streams:
         for idx, i in enumerate(stream):
             out_streams[idx] += bytes([i])
@@ -71,7 +76,11 @@ def detect_key_stream(streams: list[bytes]) -> bytes:
     inv_stream = transpose_streams(streams)
     # each stream is a single-character XOR cipher
     # we detect it, to build the key stream
+    # Hàm sau đó áp dụng hàm decode_single_byte_xor_cypher cho mỗi luồng trong inv_stream để giải mã mỗi luồng
     key_stream = bytes(map(decode_single_byte_xor_cypher, inv_stream))
+
+    # Kết quả là một chuỗi byte, mỗi byte trong chuỗi đại diện cho một khóa
+    # được sử dụng để mã hóa một byte tương ứng trong các luồng đầu vào
     return key_stream
 
 

@@ -1,5 +1,6 @@
 import random
 from Crypto.Random import get_random_bytes
+from base64 import b64decode
 
 from src.Utilities.AES import aes_cbc_decrypt, aes_cbc_encrypt
 from src.Utilities.Byte_Calculations import xor_bytes
@@ -41,6 +42,7 @@ class Oracle:
 
 def decrypt_block_mask(oracle: Oracle, current_block: bytes) -> bytes:
     # initialize empty mask
+    # https://www.programiz.com/python-programming/methods/built-in/bytearray
     mask = bytearray(AES_BLOCK_SIZE)
 
     # decrypt byte at a time from end to start
@@ -49,7 +51,7 @@ def decrypt_block_mask(oracle: Oracle, current_block: bytes) -> bytes:
         pad_value = AES_BLOCK_SIZE - byte_idx
         last_block = bytearray(xor_bytes((bytes([pad_value] * AES_BLOCK_SIZE), mask)))
 
-        # iterate values until the padding is correct
+        # iterate values until the padding is correct (bruteforce)
         for byte_val in range(2**8):
             last_block[byte_idx] = byte_val
             sequence = last_block + current_block
@@ -88,6 +90,7 @@ def main():
     for _ in range(100):
         ciphertext, iv = oracle.encrypt()
         plaintext = padding_attack(oracle, ciphertext, iv)
+        print(b64decode(plaintext))
         assert plaintext in oracle.data
 
     print('All tests passed successfully')
