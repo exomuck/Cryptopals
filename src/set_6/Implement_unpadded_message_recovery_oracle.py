@@ -1,3 +1,6 @@
+# https://en.wikipedia.org/wiki/RSA_(cryptosystem)
+# https://crypto.stackexchange.com/questions/3608/why-is-padding-used-for-rsa-encryption-given-that-it-is-not-a-block-cipher
+# https://www.simplilearn.com/tutorials/cryptography-tutorial/rsa-algorithm
 import random
 import time
 from hashlib import sha256
@@ -30,6 +33,8 @@ class Server:
         return plaintext
 
 
+# Server decrypt mọi data nhận được mà không kiểm tra xem có hợp lệ không
+# -> Gửi thông tin sai -> Nhận được plaintext -> ciphertext
 def attack(server: Server, ciphertext: int) -> bytes:
     # some consts
     N = server.rsa_obj.n

@@ -1,3 +1,9 @@
+# https://learn.microsoft.com/vi-vn/windows/win32/seccertenroll/about-introduction-to-asn-1-syntax-and-encoding
+# https://en.wikipedia.org/wiki/ASN.1
+# https://en.wikipedia.org/wiki/PKCS_1
+# https://www.rfc-editor.org/rfc/rfc2313
+# https://www.ibm.com/docs/en/zos/2.5.0?topic=cryptography-pkcs-1-formats
+# https://crypto.stackexchange.com/questions/58600/bleichenbacher-rsa1024-signature-forgery-closed-form-solution
 import hashlib
 import math
 
@@ -63,6 +69,11 @@ class RsaSigPkcs:
         return msg_hash == real_msg_hash
 
 
+# "This is a bug because it implies the verifier isn't checking all the padding.
+# If you don't check the padding, you leave open the possibility that instead
+# of hundreds of ffh bytes, you have only a few, which if you think about it
+# means there could be squizzilions of possible numbers that could produce a
+# valid-looking signature."
 def forge_sig(msg: bytes, sig_len: int):
     # create ASN1 | HASH
     msg_hash = hashlib.md5(msg).digest()
@@ -82,6 +93,7 @@ def forge_sig(msg: bytes, sig_len: int):
     return sig + 1
 
 
+# signature fake khi được decrypt bằng key public RSA sẽ tạo 1 giá trị hash phù hợp với message
 def main():
     # create signature object
     rsa_sig = RsaSigPkcs()

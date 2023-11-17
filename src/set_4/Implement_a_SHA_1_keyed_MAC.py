@@ -1,3 +1,4 @@
+# https://www.youtube.com/watch?v=MQtHLn3dvQg
 from Crypto.Random import get_random_bytes
 from src.Utilities.Hash import sha1
 

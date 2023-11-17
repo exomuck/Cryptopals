@@ -1,3 +1,7 @@
+# giá trị A được gửi đến server không phải là một giá trị ngẫu nhiên như
+# thông thường, mà là một giá trị cố định bằng 3*N. Điều này dẫn đến việc
+# u và S_c đều bằng 0, bất kể mật khẩu thực sự là gì. Do đó, client
+# có thể xác minh mình với server mà không cần biết mật khẩu.
 import hashlib
 import hmac
 import json

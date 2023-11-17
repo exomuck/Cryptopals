@@ -3,10 +3,10 @@ from src.Utilities.Mathematics import power_mod
 
 
 def main():
-    # example
+    # example (làm theo đề bài)
     p, g = 37, 5
 
-    # secret
+    # secret (làm theo đề bài)
     a = random.randint(1, 37)
     b = random.randint(1, 37)
 

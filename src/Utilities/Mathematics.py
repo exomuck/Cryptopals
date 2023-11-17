@@ -1,4 +1,3 @@
-from functools import reduce
 from typing import Iterator
 
 
@@ -96,31 +95,3 @@ def trial_division(n: int) -> Iterator[int]:
 
     if n != 1:
         yield n
-
-
-def chinese_remainder(n_list: list[int], a_list: list[int]) -> int:
-    """
-    Solution of the system:
-    x = a1 (mod n1)
-    x = a2 (mod n2)
-    ...
-    x = ak (mod k)
-
-    Such that 0 <= x < N,
-    where N = n1 * n2 * ... * nk
-
-    https://en.wikipedia.org/wiki/Chinese_remainder_theorem#Existence_(direct_construction)
-    """
-    x = 0
-    N = reduce(lambda a, b: a * b, n_list)
-    for ni, ai in zip(n_list, a_list):
-        Ni = N // ni
-        _, (Mi, _) = extended_gcd(Ni, ni)
-        x += ai*Mi*Ni
-
-    return x % N
-
-
-if __name__ == '__main__':
-    x = chinese_remainder([2, 3, 5, 7, 13], [1, 2, 1, 5, 10])
-    print(x)

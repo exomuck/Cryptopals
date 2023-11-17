@@ -1,3 +1,5 @@
+# https://en.wikipedia.org/wiki/Digital_Signature_Algorithm#:~:text=The%20Digital%20Signature%20Algorithm%20(DSA,Schnorr%20and%20ElGamal%20signature%20schemes.
+# https://www.simplilearn.com/tutorials/cryptography-tutorial/digital-signature-algorithm
 import hashlib
 import random
 
@@ -5,6 +7,7 @@ from src.Utilities.Mathematics import invmod
 
 
 class DSA:
+    # copy paste từ đề bài
     p = int('800000000000000089e1855218a0e7dac38136ffafa72eda7'
             '859f2171e25e65eac698c1702578b07dc2a1076da241c76c6'
             '2d374d8389ea5aeffd3226a0530cc565f3bf6b50929139ebe'
@@ -30,10 +33,14 @@ class DSA:
     def hashlib_func(x):
         return int(hashlib.sha1(x).hexdigest(), 16)
 
+    # Tạo 1 signature cho msg
     def sign(self, msg: bytes):
         s = 0
         while True:
+            # Lấy 1 số ngẫu nhiên k
             k = random.randint(1, self.q - 1)
+            # Tính r = (g^k mod p) mod q và s = (k^-1 * (hashlib_func(msg) + xr)) mod q
+            # hashlib_func là hàm hash , nếu r = 0 hay s = 0 thì nó sẽ chọn k khác
             r = pow(self.g, k, self.p) % self.q
             if r == 0:
                 continue
@@ -45,6 +52,8 @@ class DSA:
 
         return r, s
 
+    # Kiểm tra chữ kĩ có hợp lệ ? Kiểm tra r và s có nằm trong danh sách 1 -> q-1
+    # Tính w, u1, u2, v. Nếu v = r thì chữ kí hợp lệ
     def verify(self, msg: bytes, sig: (int, int)) -> bool:
         # unpack sig
         r, s = sig
@@ -61,6 +70,9 @@ class DSA:
         return v == r
 
 
+# https://crypto.stackexchange.com/questions/7904/attack-on-dsa-with-signatures-made-with-k-k1-k2
+# k được chọn từ 1 tập hợp các số nguyên từ 1-2^16 -> bruteforce k
+# Khi tìm được k thì estimate_x_given_k sẽ được sử dụng để tính xấp xỉ x
 class Attack:
     def __init__(self, msg: bytes, r: int, s: int, q: int, p: int, g: int, hash_func, pub_key: int):
         self.msg = msg
@@ -82,12 +94,14 @@ class Attack:
             if tmp_r == self.r:
                 return k
 
+    # vừa detech vừa estimate -> k và x -> test với class DSA
     def detect_private_key(self):
         k = self.detect_k(2**16)
         x = self.estimate_x_given_k(k)
         return x, k
 
 
+#
 def main():
     # given params
     y = int('84ad4719d044495496a3201c8ff484feb45b962e7302e56a392aee4'

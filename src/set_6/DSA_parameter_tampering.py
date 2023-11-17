@@ -1,9 +1,11 @@
+# https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.includehelp.com%2Fcryptography%2Fdigital-signature-algorithm-dsa.aspx&psig=AOvVaw0pKbC5BV3uQ0CWC0fcYGv6&ust=1700290236125000&source=images&cd=vfe&ved=0CBIQjhxqFwoTCOjb_Z3FyoIDFQAAAAAdAAAAABAE
 import hashlib
 import random
 
 from src.Utilities.Mathematics import invmod
 
 
+# Tương tự bài DSA_key_recovery_from_nonce chỉ thay đổi 1 ít ở class DSA
 class DSA:
     p = int('800000000000000089e1855218a0e7dac38136ffafa72eda7'
             '859f2171e25e65eac698c1702578b07dc2a1076da241c76c6'
@@ -26,6 +28,7 @@ class DSA:
         self.x = random.randint(1, self.q - 1)  # private key
         self.y = pow(self.g, self.x, self.p)  # public key
 
+        # Thêm đoạn này
         if override_g is not None:
             self.g = override_g
 
@@ -60,24 +63,24 @@ class DSA:
 def main():
     # example 1
     dsa = DSA(override_g=0)
-    msg = b'Whats Wrong??'
+    msg = b'Hello, world'
 
     sig = dsa.sign(msg)
     print(sig)
 
     print(dsa.verify(msg, sig))
-    print(dsa.verify(b'what is going on in here', (0, 85478656467)))
+    print(dsa.verify(b'Goodbye, world', (0, 85478656467)))
 
     # example 2
-    dsa = DSA(override_g=DSA.p+1)
-
-    z = 4
-    z_inv = invmod(z, dsa.q)
-    r = pow(dsa.y, z, dsa.p) % dsa.q
-    s = (z_inv * r) % dsa.q
-    magic_sig = (r, s)
-
-    print(dsa.verify(b'Whattttt ???????', magic_sig))
+    # dsa = DSA(override_g=DSA.p+1)
+    #
+    # z = 4
+    # z_inv = invmod(z, dsa.q)
+    # r = pow(dsa.y, z, dsa.p) % dsa.q
+    # s = (z_inv * r) % dsa.q
+    # magic_sig = (r, s)
+    #
+    # print(dsa.verify(b'Goodbye, world', magic_sig))
 
 
 if __name__ == '__main__':

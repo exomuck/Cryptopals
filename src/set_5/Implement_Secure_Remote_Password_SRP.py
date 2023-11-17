@@ -1,3 +1,5 @@
+# https://www.linkedin.com/pulse/what-secure-remote-password-synologyc2/
+# https://en.wikipedia.org/wiki/Secure_Remote_Password_protocol
 import hashlib
 import hmac
 import secrets
@@ -74,5 +76,8 @@ def main():
         print('Client verification failed')
 
 
+# Tạo 1 khóa riêng a và b ngẫu nhiên sau đó tính key public bằng lũy thừa g với key rồi % p -> A và B
+# Tính tham số ngẫu nhiên u bằng cách hash sha256 A và B
+# Tính s1 và s2 -> Xác nhận key giống nhau (K_s = K_c)
 if __name__ == '__main__':
     main()

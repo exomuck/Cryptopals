@@ -1,6 +1,7 @@
 import random
 from functools import reduce
 
+# very big p
 p = int('ffffffffffffffffc90fdaa22168c234c4c6628b80d'
         'c1cd129024e088a67cc74020bbea63b139b22514a08'
         '798e3404ddef9519b3cd3a431b302b0a6df25f14374'

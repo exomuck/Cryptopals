@@ -6,16 +6,12 @@ from src.Utilities.AES import aes_cbc_encrypt, aes_cbc_decrypt
 AES_BLOCK_SIZE = 16
 
 
-def pkcs7_pad(stream: bytes, block_size: int) -> bytes:
-    pad_len = block_size - (len(stream) % block_size)
-    return stream + bytes([pad_len] * pad_len)
-
-
 class Oracle:
     def __init__(self):
         self.key = get_random_bytes(AES_BLOCK_SIZE)
         self.nonce = self.key
 
+    # Hàm encode đọc plaintext sau đó mã hóa bằng aes cbc rồi trả về cipher text
     def encode(self, plaintext: bytes) -> bytes:
         prefix = b"comment1=cooking%20MCs;userdata="
         suffix = b";comment2=%20like%20a%20pound%20of%20bacon"
@@ -28,6 +24,7 @@ class Oracle:
         ciphertext = aes_cbc_encrypt(plaintext, key=self.key, nonce=self.nonce, add_padding=True)
         return ciphertext
 
+    # Kiểm tra trong chuỗi decrypt có chứa admin=true hay không
     def parse(self, ciphertext: bytes) -> bool:
         decrypted = aes_cbc_decrypt(ciphertext, key=self.key, nonce=self.nonce, remove_padding=True)
 
@@ -41,15 +38,15 @@ class Oracle:
 
 
 def detect_key(oracle: Oracle):
-    # some ciphertext with at least 3 blocks
+    # Tạo 3 chuỗi byte có độ dài ít nhất 3 khối AES
     ciphertext = oracle.encode(b'A' * 3 * AES_BLOCK_SIZE)
     ciphertext = bytearray(ciphertext)
 
-    # modify ciphertext: C_1, C_2, C_3 -> C_1, 0, C_1
+    # Chỉnh sửa cipher text: C_1, C_2, C_3 -> C_1, 0, C_1
     ciphertext[AES_BLOCK_SIZE:2*AES_BLOCK_SIZE] = bytes([0]*AES_BLOCK_SIZE)
     ciphertext[2*AES_BLOCK_SIZE:3*AES_BLOCK_SIZE] = ciphertext[:AES_BLOCK_SIZE]
 
-    # send modified ciphertext to oracle
+    # Cipher text qua parse
     try:
         oracle.parse(ciphertext)
         raise Exception('detect_key failed')

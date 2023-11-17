@@ -2,6 +2,9 @@ from DSA_key_recovery_from_nonce import DSA
 from src.Utilities.Mathematics import invmod
 
 
+# evaluate k từ 2 signature khác nhau (s1-r và s2-r) với 2 message khác nhau (msg1 và msg2)
+# k được sử dụng trong cả 2 chữ ký -> sự khác biệt giữa 2 chữ kí sẽ bằng sự khác biệt giữa 2 giá trị hash của message
+# -> Có thể tính được k bằng cách nhân sự khác biệt của 2 hash với nghịch đảo mod của sự khác biệt giữa 2 signature
 def eval_k(msg1: bytes, s1: int, msg2: bytes, s2: int) -> int:
     # domain parameters
     q = DSA.q
@@ -16,6 +19,7 @@ def eval_k(msg1: bytes, s1: int, msg2: bytes, s2: int) -> int:
     return k
 
 
+# Tương tự estimate ở bài trước
 def estimate_x_given_k(k: int, msg: bytes, r: int, s: int):
     # domain parameters
     q, H = DSA.q, DSA.hashlib_func
@@ -25,6 +29,7 @@ def estimate_x_given_k(k: int, msg: bytes, r: int, s: int):
     return x_est
 
 
+# Trường hợp thực tế k sẽ được chọn ngẫu nhiên và thay mới với mỗi signature để tránh lỗ hổng DSA
 def main():
     msg1 = b'Listen for me, you better listen for me now. '
     r1 = 1105520928110492191417703162650245113664610474875

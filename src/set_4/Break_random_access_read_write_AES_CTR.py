@@ -12,6 +12,7 @@ class EditOracle:
         self.key = get_random_bytes(AES_BLOCK_SIZE)
         self.ctr_obj = AesCtr(self.key)
 
+    # Hàm đọc file
     def get_cipher(self):
         # load cipher and decode base64 to bytes
         with open('../../assets/Break_random_access_read_write_AES_CTR.txt', 'r') as fh:
@@ -24,6 +25,7 @@ class EditOracle:
         ciphertext = self.ctr_obj.encrypt(plaintext)
         return ciphertext
 
+    # Hàm edit
     def edit(self, ciphertext: bytes, offset: int, new_text: bytes):
         # Phương thức này cho phép bạn thay thế một phần của ciphertext bằng văn bản mới.
         # Nó tạo ra một keystream có độ dài giống như ciphertext bằng cách sử dụng đối tượng CTR.
